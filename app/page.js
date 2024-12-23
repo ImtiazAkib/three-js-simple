@@ -1,101 +1,116 @@
-import Image from "next/image";
+"use client";
+import {
+  Float,
+  Html,
+  MeshReflectorMaterial,
+  OrbitControls,
+  PivotControls,
+  Reflector,
+  Text,
+  TransformControls,
+} from "@react-three/drei";
+import { Canvas, useFrame, extend, useThree } from "@react-three/fiber";
+import { useMemo, useRef } from "react";
+// import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import * as THREE from "three";
+
+extend({ OrbitControls });
+
+function CustomObject() {
+  const bufferRef = useRef();
+  useEffect(() => {
+    bufferRef.current?.computeVertexNormals();
+  }, []);
+
+  const verticesCount = 10 * 3;
+  const positions = useMemo(() => {
+    const positions = new Float32Array(verticesCount * 3);
+    for (let i = 0; i < verticesCount * 3; i++) {
+      positions[i] = (Math.random() - 0.5) * 2;
+    }
+    return positions;
+  }, []);
+
+  return (
+    <mesh>
+      <bufferGeometry ref={bufferRef}>
+        <bufferAttribute
+          itemSize={3}
+          array={positions}
+          count={verticesCount}
+          attach="attributes-position"
+        />
+      </bufferGeometry>
+      <meshStandardMaterial color="blue" side={THREE.DoubleSide} />
+    </mesh>
+  );
+}
+
+function GRoupMesh() {
+  const newRef = useRef();
+  const groupRef = useRef();
+  const { camera, gl } = useThree();
+  useFrame((state, delta) => {
+    // newRef.current.rotation.y += delta;
+    // groupRef.current.rotation.y += delta;
+  });
+  return (
+    <>
+      {/* <orbitControls args={[camera, gl.domElement]} /> */}
+      <OrbitControls makeDefault />
+      {/* <CustomObject /> */}
+      <directionalLight position={[1, 2, 3]} intensity={2} />
+      <ambientLight intensity={1} />
+
+      <mesh scale={1.3} rotation-y={Math.PI * 0.35} position-x={2} ref={newRef}>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color="red" />
+      </mesh>
+      <TransformControls object={newRef} mode={"translate"} />
+      <PivotControls
+        anchor={[0, 0, 0]}
+        depthTest={false}
+        lineWidth={4}
+        scale={100}
+        fixed={true}
+      >
+        <mesh position-x={-2}>
+          <sphereGeometry args={[1, 32, 32]} />
+          <meshStandardMaterial color="orange" />
+          <Html position={[1, 1, 0]} center distanceFactor={5}>
+            <div className="whitespace-nowrap bg-black/50 text-white px-4 py-2 rounded-2xl">
+              Hello there
+            </div>
+          </Html>
+        </mesh>
+      </PivotControls>
+
+      <mesh rotation-x={-Math.PI * 0.5} position={[0, -1, 0]} scale={10}>
+        <planeGeometry args={[1, 1]} />
+        {/* <meshStandardMaterial color="greenyellow" /> */}
+        {/* <MeshReflectorMaterial /> */}
+      </mesh>
+      <Float speed={5} floatIntensity={2}>
+        <Text
+          color="salmon"
+          fontSize={0.6}
+          maxWidth={2}
+          textAlign="center"
+          position-y={2}
+        >
+          I LOVE DREI
+        </Text>
+      </Float>
+    </>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+    <div className="fixed h-full w-full overflow-hidden bg-sky-500">
+      <Canvas flat>
+        <GRoupMesh />
+      </Canvas>
     </div>
   );
 }
